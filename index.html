@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduGenie - AI Learning Assistant</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+
+        /* Quiz Question */
+
+        .quiz-question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+
+
+        /* Quiz Options */
+
+        .quiz-option {
+            margin: 8px 0;
+        }
+
+
+       .option {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    cursor: pointer;
+    background: white;
+    color: black !important;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+        .option:hover {
+            background: #f0f0f0;
+        }
+
+
+        /* Quiz Feedback */
+
+        .quiz-feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+
+        /* Error */
+
+        .quiz-error {
+            color: red;
+            margin-top: 10px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
+    <h1>Welcome to EduGenie 🧠</h1>
+
+    <p class="subtitle">
+        Your personal AI-powered learning assistant
+    </p>
+
+
+
+    <!-- ========================= -->
+    <!-- ASK QUESTION -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>Ask a Question</h2>
+
+        <input
+            type="text"
+            id="question"
+            placeholder="Why is the sky blue?"
+        >
+
+        <button onclick="askQuestion()">
+            Get Answer
+        </button>
+
+        <div
+            id="answer"
+            class="result">
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!-- EXPLANATION -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>Need an Explanation?</h2>
+
+        <input
+            type="text"
+            id="topic"
+            placeholder="Enter any topic"
+        >
+
+        <button onclick="getExplanation()">
+            Explain
+        </button>
+
+        <div
+            id="explanation"
+            class="result">
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!-- SUMMARY -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>Summarize a Paragraph</h2>
+
+        <textarea
+            id="summaryText"
+            placeholder="Paste a long paragraph here..."
+        ></textarea>
+
+        <button onclick="summarizeText()">
+            Summarize
+        </button>
+
+        <div
+            id="summary"
+            class="result">
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!-- QUIZ -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>Generate a Quiz</h2>
+
+        <input
+            type="text"
+            id="quizTopic"
+            placeholder="Enter quiz topic"
+        >
+
+        <button onclick="generateQuiz()">
+            Generate Quiz
+        </button>
+
+        <div
+            id="quiz"
+            class="result">
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================= -->
+    <!-- LEARNING RECOMMENDATIONS -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <h2>Get Learning Recommendations</h2>
+
+        <input
+            type="text"
+            id="learningTopic"
+            placeholder="e.g. SQL"
+        >
+
+        <button onclick="getLearningPath()">
+            Get Recommendations
+        </button>
+
+        <div
+            id="learningPath"
+            class="result">
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+// =====================================================
+// ASK QUESTION
+// =====================================================
+
+async function askQuestion() {
+
+    const question =
+        document.getElementById("question").value;
+
+    const result =
+        document.getElementById("answer");
+
+
+    if (!question.trim()) {
+
+        result.innerHTML =
+            "Please enter a question.";
+
+        return;
+    }
+
+
+    result.innerHTML =
+        "Thinking...";
+
+
+    try {
+
+        const response =
+            await fetch("/qa", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    question: question
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        result.innerHTML =
+            "<strong>Answer:</strong><br>" +
+            (
+                data.answer ||
+                "No answer received."
+            );
+
+
+    } catch (error) {
+
+        result.innerHTML =
+            "Error: " + error;
+
+    }
+
+}
+
+
+
+// =====================================================
+// EXPLANATION
+// =====================================================
+
+async function getExplanation() {
+
+    const topic =
+        document.getElementById("topic").value;
+
+    const result =
+        document.getElementById("explanation");
+
+
+    if (!topic.trim()) {
+
+        result.innerHTML =
+            "Please enter a topic.";
+
+        return;
+    }
+
+
+    result.innerHTML =
+        "Generating explanation...";
+
+
+    try {
+
+        const response =
+            await fetch("/explain", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    topic: topic
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        result.innerHTML =
+            "<strong>Explanation:</strong><br>" +
+            (
+                data.explanation ||
+                "No explanation received."
+            );
+
+
+    } catch (error) {
+
+        result.innerHTML =
+            "Error: " + error;
+
+    }
+
+}
+
+
+
+// =====================================================
+// SUMMARY
+// =====================================================
+
+async function summarizeText() {
+
+    const text =
+        document.getElementById("summaryText").value;
+
+    const result =
+        document.getElementById("summary");
+
+
+    if (!text.trim()) {
+
+        result.innerHTML =
+            "Please enter some text.";
+
+        return;
+    }
+
+
+    result.innerHTML =
+        "Summarizing...";
+
+
+    try {
+
+        const response =
+            await fetch("/summarize", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    text: text
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        result.innerHTML =
+            "<strong>Summary:</strong><br>" +
+            (
+                data.summary ||
+                "No summary received."
+            );
+
+
+    } catch (error) {
+
+        result.innerHTML =
+            "Error: " + error;
+
+    }
+
+}
+
+
+
+// =====================================================
+// GENERATE QUIZ
+// =====================================================
+
+async function generateQuiz() {
+
+    const topic =
+        document.getElementById("quizTopic").value;
+
+    const result =
+        document.getElementById("quiz");
+
+
+    if (!topic.trim()) {
+
+        result.innerHTML =
+            "Please enter a quiz topic.";
+
+        return;
+    }
+
+
+    result.innerHTML =
+        "Generating quiz...";
+
+
+    try {
+
+        const response =
+            await fetch("/quiz", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    topic: topic
+                })
+
+            });
+
+
+        const data =
+            await response.json();
+
+
+        // Check backend error
+
+        if (data.error) {
+
+            result.innerHTML =
+                "<strong>Quiz Error:</strong><br>" +
+                "<span class='quiz-error'>" +
+                data.error +
+                "</span>";
+
+            return;
+        }
+
+
+        // Check quiz
+
+        if (!data.quiz ||
+            data.quiz.length === 0) {
+
+            result.innerHTML =
+                "<strong>Quiz:</strong><br>" +
+                "No quiz received.";
+
+            return;
+        }
+
+
+        // Save quiz globally
+
+        window.currentQuiz =
+            data.quiz;
+
+
+        let html =
+            "<strong>Quiz:</strong><br><br>";
+
+
+        // Create questions
+
+        data.quiz.forEach(
+            (question, index) => {
+
+
+                html += `
+                    <div class="quiz-question">
+
+                        <p>
+                            <b>
+                                ${index + 1}.
+                                ${question.question}
+                            </b>
+                        </p>
+                `;
+
+
+                // Create options
+
+                if (
+                    question.options &&
+                    question.options.length > 0
+                ) {
+
+
+                    question.options.forEach(
+                        (option, optionIndex) => {
+
+
+                            const letter =
+                                String.fromCharCode(
+                                    65 + optionIndex
+                                );
+
+
+                            html += `
+                                <div class="quiz-option">
+
+                                    <button
+                                        type="button"
+                                        class="option"
+                                        onclick="checkAnswer(
+                                            ${index},
+                                            ${optionIndex}
+                                        )"
+                                    >
+
+                                        ${letter}.
+                                        ${option}
+
+                                    </button>
+
+                                </div>
+                            `;
+
+                        }
+                    );
+
+
+                } else {
+
+                    html += `
+                        <p class="quiz-error">
+                            Options not received.
+                        </p>
+                    `;
+
+                }
+
+
+                // Feedback area
+
+                html += `
+                        <div
+                            id="feedback-${index}"
+                            class="quiz-feedback">
+                        </div>
+
+                    </div>
+
+                    <hr>
+                `;
+
+            }
+        );
+
+
+        result.innerHTML =
+            html;
+
+
+    } catch (error) {
+
+        result.innerHTML =
+            "Error: " + error;
+
+    }
+
+}
+
+
+
+// =====================================================
+// CHECK QUIZ ANSWER
+// =====================================================
+
+function checkAnswer(
+    questionIndex,
+    optionIndex
+) {
+
+
+    // Get question
+
+    const question =
+        window.currentQuiz[
+            questionIndex
+        ];
+
+
+    // Get selected option
+
+    const selectedOption =
+        question.options[
+            optionIndex
+        ];
+
+
+    // Get correct answer
+
+    const correctAnswer =
+        question.answer;
+
+
+    // Get feedback element
+
+    const feedback =
+        document.getElementById(
+            "feedback-" +
+            questionIndex
+        );
+
+
+    // Compare answers
+
+    if (
+
+        selectedOption
+            .trim()
+            .toLowerCase()
+
+        ===
+
+        correctAnswer
+            .trim()
+            .toLowerCase()
+
+    ) {
+
+
+        // Correct
+
+        feedback.innerHTML =
+            "✅ Correct!";
+
+
+        feedback.style.color =
+            "green";
+
+
+    } else {
+
+
+        // Wrong
+
+        feedback.innerHTML =
+            "❌ Wrong!<br>" +
+            "Correct answer: <strong>" +
+            correctAnswer +
+            "</strong>";
+
+
+        feedback.style.color =
+            "red";
+
+    }
+
+}
+
+
+
+// =====================================================
+// LEARNING RECOMMENDATIONS
+// =====================================================
+
+async function getLearningPath() {
+
+    const topic =
+        document.getElementById(
+            "learningTopic"
+        ).value;
+
+
+    const result =
+        document.getElementById(
+            "learningPath"
+        );
+
+
+    if (!topic.trim()) {
+
+        result.innerHTML =
+            "Please enter a learning topic.";
+
+        return;
+    }
+
+
+    result.innerHTML =
+        "Creating learning path...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/learn/recommendations",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        topic: topic
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        result.innerHTML =
+            "<strong>Learning Path:</strong><br>" +
+
+            (
+                data.recommendations ||
+
+                data.error ||
+
+                "No recommendations received."
+            );
+
+
+    } catch (error) {
+
+        result.innerHTML =
+            "Error: " + error;
+
+    }
+
+}
+
+
+</script>
+
+</body>
+
+</html>
